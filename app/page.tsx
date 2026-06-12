@@ -33,8 +33,14 @@ type ExecutionStage = "created" | "sent" | "delivered" | "opened" | "clicked" | 
 
 function parseAudienceSize(audience: string): number {
   const match = audience.match(/[\d,]+/);
-  if (!match) return 342;
-  return parseInt(match[0].replace(/,/g, ""), 10);
+
+  if (!match) {
+    return 1500;
+  }
+
+  const size = parseInt(match[0].replace(/,/g, ""), 10);
+
+  return isNaN(size) ? 1500 : size;
 }
 
 function getExecutionTargets(sent: number) {
@@ -922,19 +928,51 @@ export default function Home() {
     };
   }, []);
 
-  const handleGenerate = () => {
-    if (!prompt.trim() || isGenerating) return;
+const handleGenerate = async () => {
+  if (!prompt.trim() || isGenerating) return;
 
-    setIsGenerating(true);
-    setGeneratedCampaign(null);
-    setIsLaunched(false);
-    setIsLaunching(false);
+  setIsGenerating(true);
+  setGeneratedCampaign(null);
+  setIsLaunched(false);
+  setIsLaunching(false);
 
-    timeoutRef.current = setTimeout(() => {
-      setGeneratedCampaign(generateMockCampaign(prompt));
-      setIsGenerating(false);
-    }, 2000);
-  };
+  try {
+    const response = await fetch("/api/generate-campaign", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        marketingGoal: prompt,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to generate campaign");
+    }
+
+    const data = await response.json();
+
+    setGeneratedCampaign({
+  name: data.name || "AI Generated Campaign",
+  audience: data.audience || "Unknown Audience",
+  reason: data.reason || "",
+  channel: data.channel || "Email",
+  message:
+    typeof data.message === "object"
+      ? `${data.message.subject}\n\n${data.message.body}`
+      : data.message || "",
+  expectedOpenRate: data.expectedOpenRate || "60%",
+  expectedClickRate: data.expectedClickRate || "15%",
+});
+
+  } catch (error) {
+    console.error(error);
+    alert("Failed to generate campaign");
+  } finally {
+    setIsGenerating(false);
+  }
+};
 
   const handlePromptChange = (value: string) => {
     setPrompt(value);
