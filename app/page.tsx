@@ -221,72 +221,13 @@ function generateMockStrategyAnalysis(prompt: string, campaign: GeneratedCampaig
   };
 }
 
-const metrics = [
-  {
-    label: "Total Customers",
-    value: "12,483",
-    change: "+8.2%",
-    icon: (
-      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
-      </svg>
-    ),
-  },
-  {
-    label: "Active Campaigns",
-    value: "142",
-    change: "+12",
-    icon: (
-      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
-      </svg>
-    ),
-  },
-  {
-    label: "Revenue Influenced",
-    value: "₹14.2L",
-    change: "+23.5%",
-    icon: (
-      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-      </svg>
-    ),
-  },
-  {
-    label: "Average Open Rate",
-    value: "72%",
-    change: "+4.1%",
-    icon: (
-      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
-      </svg>
-    ),
-  },
-];
-
 const examplePrompts = [
   "Bring back inactive customers",
   "Increase repeat purchases",
   "Promote summer collection",
 ];
 
-const insights = [
-  {
-    title: "High-value segment identified",
-    description: "342 customers with 3+ past purchases haven't ordered in 60 days.",
-    type: "opportunity" as const,
-  },
-  {
-    title: "Email timing optimized",
-    description: "Tuesday 10 AM sends show 2.4× higher engagement in your audience.",
-    type: "success" as const,
-  },
-  {
-    title: "Cart abandonment spike",
-    description: "18% increase in abandoned carts over the last 7 days.",
-    type: "alert" as const,
-  },
-];
+
 
 const insightStyles = {
   opportunity: "border-cyan-500/20 bg-cyan-500/5 text-cyan-400",
@@ -855,12 +796,7 @@ function GeneratedCampaignCard({
             >
               {isLaunching ? "Launching..." : "Launch Campaign"}
             </button>
-            <button
-              type="button"
-              className="rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-2.5 text-sm font-medium text-zinc-400 transition-all hover:border-white/[0.14] hover:text-zinc-200"
-            >
-              Edit Message
-            </button>
+         
           </div>
         )}
       </div>
@@ -911,13 +847,82 @@ function LoadingState() {
 export default function Home() {
   const [prompt, setPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+const [customerCount, setCustomerCount] = useState(0);
+const [orderCount, setOrderCount] = useState(0);
   const [generatedCampaign, setGeneratedCampaign] = useState<GeneratedCampaign | null>(null);
+
+const metrics = [
+  {
+    label: "Total Customers",
+    value: customerCount.toString(),
+    change: "+0%",
+    icon: (
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+      </svg>
+    ),
+  },
+  {
+    label: "Orders Loaded",
+    value: orderCount.toString(),
+    change: "+0",
+    icon: (
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
+      </svg>
+    ),
+  },
+  {
+    label: "Revenue Influenced",
+    value: generatedCampaign ? "Generated" : "₹0",
+    change: "+0%",
+    icon: (
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+      </svg>
+    ),
+  },
+  {
+    label: "Average Open Rate",
+    value: generatedCampaign?.expectedOpenRate || "0%",
+    change: "+0%",
+    icon: (
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+      </svg>
+    ),
+  },
+];
+
+const insights = [
+  {
+    title: "Customers Loaded",
+    description: `${customerCount} customers available for segmentation.`,
+    type: "success" as const,
+  },
+  {
+    title: "Orders Loaded",
+    description: `${orderCount} orders available for campaign analysis.`,
+    type: "opportunity" as const,
+  },
+  {
+    title: "Campaign Status",
+    description: generatedCampaign
+      ? "AI campaign generated successfully."
+      : "Generate a campaign to view insights.",
+    type: "alert" as const,
+  },
+];
+
   const [isLaunched, setIsLaunched] = useState(false);
   const [isLaunching, setIsLaunching] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const launchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const score = 87;
+  const score =
+  generatedCampaign && customerCount > 0 && orderCount > 0
+    ? 85
+    : 0;
   const circumference = 2 * Math.PI * 54;
   const strokeOffset = circumference - (score / 100) * circumference;
 
@@ -943,8 +948,10 @@ const handleGenerate = async () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        marketingGoal: prompt,
-      }),
+  marketingGoal: prompt,
+  customerCount,
+  orderCount,
+}),
     });
 
     if (!response.ok) {
@@ -980,7 +987,39 @@ const handleGenerate = async () => {
     setIsLaunched(false);
     setIsLaunching(false);
   };
+const handleCustomerUpload = (
+  e: React.ChangeEvent<HTMLInputElement>
+) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
 
+  const reader = new FileReader();
+
+  reader.onload = (event) => {
+    const text = event.target?.result as string;
+    const rows = text.split("\n").filter((row) => row.trim());
+    setCustomerCount(Math.max(0, rows.length - 1));
+  };
+
+  reader.readAsText(file);
+};
+
+const handleOrderUpload = (
+  e: React.ChangeEvent<HTMLInputElement>
+) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = (event) => {
+    const text = event.target?.result as string;
+    const rows = text.split("\n").filter((row) => row.trim());
+    setOrderCount(Math.max(0, rows.length - 1));
+  };
+
+  reader.readAsText(file);
+};
   const handleLaunch = () => {
     if (isLaunched || isLaunching) return;
 
@@ -1079,6 +1118,51 @@ const handleGenerate = async () => {
 
         {/* Main Content Grid */}
         <section className="grid grid-cols-1 gap-6 lg:grid-cols-5">
+{/* Customer Data Upload */}
+<GlassCard className="lg:col-span-2 p-6">
+  <h2 className="text-lg font-semibold text-white">
+    Customer Data
+  </h2>
+
+  <p className="mt-2 text-sm text-zinc-500">
+    Upload customer and order CSV files
+  </p>
+
+  <div className="mt-4 space-y-4">
+    <div>
+      <label className="mb-2 block text-sm text-zinc-400">
+        Customers CSV
+      </label>
+      <input
+  type="file"
+  accept=".csv"
+  onChange={handleCustomerUpload}
+  className="w-full rounded-lg border border-white/10 p-2"
+/>
+    </div>
+
+    <div>
+      <label className="mb-2 block text-sm text-zinc-400">
+        Orders CSV
+      </label>
+      <input
+  type="file"
+  accept=".csv"
+  onChange={handleOrderUpload}
+  className="w-full rounded-lg border border-white/10 p-2"
+/>
+    </div>
+
+    <div className="rounded-lg bg-white/5 p-3">
+      <p className="text-sm text-zinc-300">
+        Customers Loaded: {customerCount}
+      </p>
+      <p className="text-sm text-zinc-300">
+        Orders Loaded: {orderCount}
+      </p>
+    </div>
+  </div>
+</GlassCard>
           {/* AI Campaign Assistant */}
           <GlassCard className="lg:col-span-3 p-6 sm:p-8">
             <div className="mb-6 flex items-center gap-3">
@@ -1250,20 +1334,14 @@ const handleGenerate = async () => {
                   </svg>
                 </div>
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-purple-300">
-                    AI Recommendation
-                  </p>
-                  <p className="mt-1 text-sm leading-relaxed text-zinc-300">
-                    Launch a win-back campaign targeting the 342 inactive high-value customers
-                    with a personalized 15% discount offer. Expected recovery rate: 28%.
-                  </p>
-                  <button
-                    type="button"
-                    className="mt-3 text-xs font-medium text-cyan-400 transition-colors hover:text-cyan-300"
-                  >
-                    Apply recommendation →
-                  </button>
-                </div>
+  <p className="text-xs font-semibold uppercase tracking-wider text-purple-300">
+    AI Recommendation
+  </p>
+  <p className="mt-1 text-sm leading-relaxed text-zinc-300">
+    Review the generated campaign and launch it to engage the selected audience
+    based on the uploaded customer data.
+  </p>
+</div>
               </div>
             </div>
           </GlassCard>

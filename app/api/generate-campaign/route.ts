@@ -6,7 +6,11 @@ const ai = new GoogleGenAI({
 
 export async function POST(req: Request) {
   try {
-    const { marketingGoal } = await req.json();
+    const {
+  marketingGoal,
+  customerCount,
+  orderCount,
+} = await req.json();
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
@@ -16,17 +20,34 @@ You are an AI CRM strategist.
 Marketing Goal:
 ${marketingGoal}
 
+Customer Count:
+${customerCount}
+
+Order Count:
+${orderCount}
+
 Generate a JSON response with:
 
 {
   "name":"",
-  "audience":"1500 customers",
+  "audience":"",
   "reason":"",
   "channel":"",
   "message":"",
   "expectedOpenRate":"",
   "expectedClickRate":""
 }
+
+Use the uploaded customer and order counts when generating
+audience size, revenue estimates, and execution metrics.
+
+The audience field must be based on the uploaded customer count.
+
+For example:
+If customerCount = 10,
+the audience must not exceed 10 customers.
+
+Never invent customer counts.
 
 Return ONLY valid JSON.
 `,
